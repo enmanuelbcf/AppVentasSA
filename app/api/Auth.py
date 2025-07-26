@@ -7,6 +7,7 @@ from jose.exceptions import JWTClaimsError
 from starlette import status
 from starlette.responses import JSONResponse
 from app.constants.general import ERROR_INTERNO_SISTEMA
+from core.config import settings
 from crud.ParametroCrud import ObtenerParametro
 from crud.UsuarioCrud import ObtenerUsuariosPorUSuarioNombre
 from utils.Security import verify_salt
@@ -19,8 +20,8 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl='/auth/obtener-token')
 SECRET_KEY = "secret_access"
 REFRESH_SECRET_KEY = "secret_refresh"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+REFRESH_TOKEN_EXPIRE_DAYS = settings.REFRESH_TOKEN_EXPIRE_DAYS
 
 @router.post('/obtener-token')
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
