@@ -1,16 +1,10 @@
 from typing import List
-
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import APIRouter
 from fastapi.params import Depends
 from starlette import status
-from starlette.routing import Router
-
 from app.api.Auth import decode_token
-from app.api.Negocio import validar_headers
-from core.config import settings
 from crud.UsuarioCrud import ObtenerUsuarios, ActualizarPassword, CrearUsuario, ObtenerUsuariosPorUSuarioNombre, \
     ObtenerUsuariosPorUSuarioNombreService
-from models.usuario_model import UsuarioModel
 from schema.Usuario_schema import UsuarioResponse, PasswordUpdateRequest, UsuarioCrate, UsuarioResponseService
 from utils.Security import verificar_apy_key
 

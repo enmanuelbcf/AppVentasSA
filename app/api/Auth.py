@@ -1,13 +1,11 @@
 from datetime import timedelta, datetime
 from typing import Annotated
-
 from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose.exceptions import JWTClaimsError
 from starlette import status
 from starlette.responses import JSONResponse
-
 from app.constants.general import ERROR_INTERNO_SISTEMA
 from crud.ParametroCrud import ObtenerParametro
 from crud.UsuarioCrud import ObtenerUsuariosPorUSuarioNombre

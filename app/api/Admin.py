@@ -3,10 +3,7 @@ from fastapi.params import Depends
 from fastapi.security import APIKeyHeader
 from starlette import status
 from typing import List
-
-
 from app.constants.general import API_KEY_NAME, ERROR_INTERNO_SISTEMA, NO_DATA_FOUND
-from core.config import settings
 from crud.Negocio_crud import crear_negocio, verNegocios
 from schema.Negocios_schema import negociosRespose
 from utils.Security import verificar_apy_key

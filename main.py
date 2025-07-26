@@ -1,7 +1,5 @@
-import asyncio
-from contextlib import asynccontextmanager
-from xml.etree.ElementInclude import include
 
+from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 from app.api.Usaurio import router as usuario_router

@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
-
 from app.api.Auth import decode_token
 from app.constants.general import ERROR_INTERNO_SISTEMA
 from crud.Dispositivo_crud import insertar_dispositivo_usuario
 from crud.UsuarioCrud import  ObtenerUsuariosPorUSuarioId
 from schema.Dispositivo_schema import CrearDispositivoUsuario
-from utils.Security import verificar_apy_key
+
 
 router = APIRouter(prefix='/Dispositivo', tags=['Dispositivo' ])
 

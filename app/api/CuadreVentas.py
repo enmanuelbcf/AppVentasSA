@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, status
-
 from app.constants.general import ERROR_INTERNO_SISTEMA
 from crud.Cuadre_crud import insertar_cuadre_venta
 from schema.Cuadre_schema import CrearCuadreVenta

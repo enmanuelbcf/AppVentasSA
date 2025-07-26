@@ -1,9 +1,5 @@
 from datetime import datetime
-from http.client import HTTPResponse
-from telnetlib import STATUS
-from tkinter.constants import E
-from typing import Optional, Annotated
-
+from typing import Optional
 from fastapi import APIRouter, Header, HTTPException, Depends, Query
 from starlette import status
 from starlette.responses import JSONResponse
@@ -13,9 +9,9 @@ from app.constants.general import ERROR_INTERNO_SISTEMA, CUANDRE_INSERTADO, APIK
 from crud.MessageCrud import RegistrarMensaje
 from crud.Negocio_crud import buscar_negocio_por_id
 from crud.Negocio_crud import insertar_cuadre_venta, ObtenerCuadrePorNegocioYFechas, ObtenerPlayersNegocio
-from schema.Negocios_schema import crearCuadreVenta, negociosRespose
+from schema.Negocios_schema import crearCuadreVenta
 from service.one_signal_service import send_push_notification
-from utils.Security import verificar_apy_key, verify_salt
+from utils.Security import verify_salt
 
 router = APIRouter(prefix='/Negocio', tags=['/Negocio'])
 
