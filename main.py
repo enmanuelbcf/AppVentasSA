@@ -9,11 +9,12 @@ from app.api.Auth import router as Auth_router
 from app.api.Negocio import router as Negocio_router
 from core.Databases import db
 from core.config import settings
+import os
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await db.connect(settings.DATADASES_APP_VENTAS)
+    await db.connect(os.getenv('DATABASE_URL'))
     print("📦 Base de datos conectada")
     yield
     await db.disconnect()
