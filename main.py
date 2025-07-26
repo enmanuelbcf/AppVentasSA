@@ -13,7 +13,7 @@ from core.config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await db.connect(settings.DATADASES_APP_VENTAS)
+    await db.connect(settings.DATABASES_APP_VENTAS)
     print("📦 Base de datos conectada")
     yield
     await db.disconnect()
