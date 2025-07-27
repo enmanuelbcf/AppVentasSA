@@ -30,6 +30,7 @@ async def insertar_cuadre_venta(cuadre: crearCuadreVenta, negocio_id:int):
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
         );
         '''
+        fecha_rd = datetime.now(ZoneInfo("America/Santo_Domingo"))
         await db.execute(
             query,
             cuadre.usuario,
@@ -42,7 +43,7 @@ async def insertar_cuadre_venta(cuadre: crearCuadreVenta, negocio_id:int):
             cuadre.monto_credito,
             cuadre.monto_transferencia,
             negocio_id,
-            datetime.now(tz=ZoneInfo("America/Santo_Domingo"))
+            fecha_rd
         )
 
     except Exception as e:
