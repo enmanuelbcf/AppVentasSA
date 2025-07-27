@@ -1,3 +1,6 @@
+from zoneinfo import ZoneInfo
+
+from annotated_types import Timezone
 from cffi.cffi_opcode import PRIM_INT
 from dns.e164 import query
 
@@ -39,7 +42,7 @@ async def insertar_cuadre_venta(cuadre: crearCuadreVenta, negocio_id:int):
             cuadre.monto_credito,
             cuadre.monto_transferencia,
             negocio_id,
-            datetime.now()
+            datetime.now(tz=ZoneInfo("America/Santo_Domingo"))
         )
 
     except Exception as e:

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     APIKEY_DEV: Optional[str] =None
     ACCESS_TOKEN_EXPIRE_MINUTES:Optional[int] =None
     REFRESH_TOKEN_EXPIRE_DAYS:Optional[int] =None
+    OBTENER_VERSION_MOVIL : Optional[str] =None
 
     class Config:
         env_file =".env"
