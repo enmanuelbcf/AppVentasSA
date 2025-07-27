@@ -30,5 +30,5 @@ app.include_router(Auth_router)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))  # Usa PORT de Railway o 8000 por defecto local
-    uvicorn.run(app, host="192.168.100.87", port=port)
-    # uvicorn.run(app, host="0.0.0.0", port=port)
+    # uvicorn.run(app, host="192.168.100.87", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=port)
