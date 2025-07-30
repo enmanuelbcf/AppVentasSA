@@ -75,6 +75,25 @@ async def BloquearUsuario(usuario_nombre:str):
             detail=f"Error al actualizar la contraseña"
         )
 
+async def ReiniciarConteo(usuario_nombre:str):
+    try:
+
+        usuario = await ObtenerUsuariosPorUSuarioNombre(usuario_nombre)
+
+        query_update = '''UPDATE usuario 
+                           SET intento_sesion = $1
+                           WHERE usuario_nombre = $2'''
+
+
+        await db.execute(query_update, 0, usuario_nombre)
+
+    except Exception as e:
+        logging.error("Ocurrió un error:\n" + traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al actualizar la contraseña"
+        )
+
 
 async def CrearUsuario(usuario: UsuarioCrate):
     try:

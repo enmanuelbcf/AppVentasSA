@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from app.constants.general import ERROR_INTERNO_SISTEMA
 from core.config import settings
 from crud.ParametroCrud import ObtenerParametro
-from crud.UsuarioCrud import ObtenerUsuariosPorUSuarioNombre, BloquearUsuario
+from crud.UsuarioCrud import ObtenerUsuariosPorUSuarioNombre, BloquearUsuario, ReiniciarConteo
 from utils.Security import verify_salt
 
 router = APIRouter(prefix='/auth', tags=['auth'])
@@ -54,6 +54,8 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
             secret=REFRESH_SECRET_KEY
         )
+
+        await ReiniciarConteo(user['usuario_nombre'])
 
         return {'data': {'access_token':access_token, 'expire_acces_token': ACCESS_TOKEN_EXPIRE_MINUTES, 'refersh_token': refersh_token,'expire_refersh_token':REFRESH_TOKEN_EXPIRE_DAYS}}
 
