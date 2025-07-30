@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from app.constants.general import ERROR_INTERNO_SISTEMA
 from core.config import settings
 from crud.ParametroCrud import ObtenerParametro
-from crud.UsuarioCrud import ObtenerUsuariosPorUSuarioNombre
+from crud.UsuarioCrud import ObtenerUsuariosPorUSuarioNombre, BloquearUsuario
 from utils.Security import verify_salt
 
 router = APIRouter(prefix='/auth', tags=['auth'])
@@ -22,6 +22,7 @@ REFRESH_SECRET_KEY = "secret_refresh"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 REFRESH_TOKEN_EXPIRE_DAYS = settings.REFRESH_TOKEN_EXPIRE_DAYS
+CONTEO_BLOQUEO = settings.CONTEO_BLOQUEO -1
 
 @router.post('/obtener-token')
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
@@ -32,9 +33,12 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
         if not user :
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='No se encontro el usuario')
         if user['estado'] =='IN':
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Usuaurio Inactivo')
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Usuario Inactivo')
+        if user['estado'] =='BL':
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Usuario Bloqueado')
         psd = verify_salt(form_data.password, user.get('password'))
         if not psd:
+            await BloquearUsuario(user['usuario_nombre'])
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Contraseña Incorrecta')
 
         generar_token = {'usuario_nombre': user['usuario_nombre'], 'correo_electronico': user['correo_electronico'], 'negocio_id': user['negocio_id'], 'usuario_id': user['usuario_id']}

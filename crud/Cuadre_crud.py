@@ -1,3 +1,5 @@
+import logging
+import traceback
 from datetime import datetime
 
 from core.Databases import db
@@ -39,4 +41,5 @@ async def insertar_cuadre_venta(cuadre: CrearCuadreVenta):
 
         )
     except Exception as e:
+        logging.error("Ocurrió un error:\n" + traceback.format_exc())
         raise e

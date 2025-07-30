@@ -18,6 +18,7 @@ ENCABEZADOS_REQUERIDOS ='Faltan Los Encabezados Requeridos'
 class Estados:
     ACTIVO ='AC'
     INACTIVO = 'IN'
+    BLOQUEADO = 'BL'
 
 #api
 API_KEY_NAME = "X-API-Key"

@@ -1,3 +1,8 @@
+import logging
+import traceback
+
+
+
 from core.Databases import db
 
 
@@ -14,6 +19,7 @@ async def ObtenerUsuarioPorUsuario(nombreUsuario: str):
         rows = await db.fetch_one(query, nombreUsuario)
         return
     except Exception as e:
+        logging.error("Ocurrió un error:\n" + traceback.format_exc())
         raise e
 
 

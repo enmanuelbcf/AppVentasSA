@@ -2,6 +2,8 @@ from typing import List
 from fastapi import APIRouter
 from fastapi.params import Depends
 from starlette import status
+from starlette.responses import JSONResponse
+
 from app.api.Auth import decode_token
 from core.config import settings
 from crud.UsuarioCrud import ObtenerUsuarios, ActualizarPassword, CrearUsuario, ObtenerUsuariosPorUSuarioNombre, \
@@ -94,6 +96,15 @@ async def Obtener_Usuarios_Por_Usuario_Nombre_Service(usuario_name):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno del servidor: {str(e)}"
         )
-@router.get('Obtener-Verison-Mobil')
+@router.get('/Obtener-Verison-Mobil')
 async def obtener_version_movil_service():
-    return settings.OBTENER_VERSION_MOVIL
+    try:
+        return JSONResponse(status_code=200, content={'version':settings.OBTENER_VERSION_MOVIL})
+    except HTTPException as http_exc:
+        raise http_exc
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno del servidor: {str(e)}"
+        )

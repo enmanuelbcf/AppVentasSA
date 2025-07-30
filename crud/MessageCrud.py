@@ -1,3 +1,5 @@
+import logging
+import traceback
 from datetime import datetime
 
 from dns.e164 import query
@@ -24,6 +26,7 @@ async def insertar_dispositivo_usuario(dispositivo: CrearDispositivoUsuario, usu
             datetime.now()
         )
     except Exception as e:
+        logging.error("Ocurrió un error:\n" + traceback.format_exc())
         raise e
 
 
@@ -45,6 +48,7 @@ async def RegistrarMensaje(dispostitvos:list, texto_mensaje:str, id_notificacion
             )
 
     except Exception as e:
+        logging.error("Ocurrió un error:\n" + traceback.format_exc())
         raise e
 
 

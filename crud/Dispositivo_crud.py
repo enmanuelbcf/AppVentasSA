@@ -1,3 +1,5 @@
+import logging
+import traceback
 from datetime import datetime
 
 from app.constants.general import plataformas
@@ -23,4 +25,5 @@ async def insertar_dispositivo_usuario(dispositivo: CrearDispositivoUsuario, usu
             dispositivo.modelo_movil
         )
     except Exception as e:
+        logging.error("Ocurrió un error:\n" + traceback.format_exc())
         raise e
