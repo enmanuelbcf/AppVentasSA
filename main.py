@@ -7,6 +7,7 @@ from app.api.Dispositivo import router as dispositivo_router
 from app.api.Admin import router as Admin_router
 from app.api.Auth import router as Auth_router
 from app.api.Negocio import router as Negocio_router
+from app.api.Portal import router as portal_router
 from core.Databases import db
 from core.config import settings
 
@@ -26,6 +27,7 @@ app.include_router(dispositivo_router)
 app.include_router(Admin_router)
 app.include_router(Negocio_router)
 app.include_router(Auth_router)
+app.include_router(portal_router)
 
 
 if __name__ == "__main__":
