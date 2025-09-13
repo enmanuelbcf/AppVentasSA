@@ -182,7 +182,7 @@ async def buscar_negocio_por_id(negocioId: int):
 
 async def obtenerNegocioPorId(negocioId: int):
     try:
-        query= 'select * from negocios'
+        query= 'select * from negocios where id =$1'
         rows = await db.fetch_one(query, negocioId)
         return rows
     except Exception as e:

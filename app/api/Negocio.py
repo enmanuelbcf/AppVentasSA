@@ -110,15 +110,12 @@ async def Obtener_Cuadre_Venta_Service(
 
 @router.get('/obtener_negocio_usuario')
 async def ObtenerNegocioUsurio(
-        myuser:dict = Depends(decode_token),):
+        my_user=Depends(decode_token)):
     try:
-        negocio = await obtenerNegocioPorId(myuser['negocio_id'])
+        negocio = await obtenerNegocioPorId(my_user['negocio_id'])
 
 
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=negocio
-        )
+        return negocio
 
     except HTTPException as http_exc:
         raise http_exc

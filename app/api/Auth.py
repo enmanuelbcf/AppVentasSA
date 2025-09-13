@@ -102,8 +102,8 @@ def crear_token(payload: dict, expires_delta: timedelta, secret) -> str:
 
 async def decode_token(token: Annotated[str, Depends(oauth2_schema)])-> dict:
     try:
-        data = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-
+        data = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        print(data)
         user = await ObtenerUsuariosPorUSuarioNombre(data['usuario_nombre'])
         return user
     except ExpiredSignatureError as e:
