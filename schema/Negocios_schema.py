@@ -1,13 +1,19 @@
+from typing import Optional
 
-from pydantic import Field
-
+from pydantic import Field, validator
 
 from pydantic import BaseModel
 
 
 class negociosRespose(BaseModel):
     id: int
-    descripcion:str
+    descripcion: str
+    preventa: bool
+    sys_cuadre: bool
+    rnc: Optional[str] = None
+    telefono: Optional[str] = None
+    direccion: Optional[str] = None
+
 
     class Config:
         from_attributes = True

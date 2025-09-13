@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse
 from app.api.Auth import decode_token
 from app.constants.general import ERROR_INTERNO_SISTEMA, CUANDRE_INSERTADO, APIKEY_INVALIDA, ENCABEZADOS_REQUERIDOS
 from crud.MessageCrud import RegistrarMensaje
-from crud.Negocio_crud import buscar_negocio_por_id
+from crud.Negocio_crud import buscar_negocio_por_id, obtenerNegocioPorId
 from crud.Negocio_crud import insertar_cuadre_venta, ObtenerCuadrePorNegocioYFechas, ObtenerPlayersNegocio
 from schema.Negocios_schema import crearCuadreVenta
 from service.one_signal_service import send_push_notification
@@ -106,6 +106,27 @@ async def Obtener_Cuadre_Venta_Service(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"{ERROR_INTERNO_SISTEMA} - {str(e)}"
+        )
+
+@router.get('/obtener_negocio_usuario')
+async def ObtenerNegocioUsurio(
+        myuser:dict = Depends(decode_token),):
+    try:
+        negocio = await obtenerNegocioPorId(myuser['negocio_id'])
+
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=negocio
+        )
+
+    except HTTPException as http_exc:
+        raise http_exc
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'{ERROR_INTERNO_SISTEMA} - {str(e)}'
         )
 
 

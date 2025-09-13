@@ -179,3 +179,12 @@ async def buscar_negocio_por_id(negocioId: int):
     except Exception as e:
         logging.error("Ocurrió un error:\n" + traceback.format_exc())
         raise e
+
+async def obtenerNegocioPorId(negocioId: int):
+    try:
+        query= 'select * from negocios'
+        rows = await db.fetch_one(query, negocioId)
+        return rows
+    except Exception as e:
+        logging.error("Ocurrió un error:\n" + traceback.format_exc())
+        raise e
