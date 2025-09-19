@@ -1,4 +1,5 @@
-from datetime import timedelta, datetime
+import time
+from datetime import timedelta, datetime, timezone
 from typing import Annotated
 from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi import APIRouter, Depends, HTTPException
@@ -56,7 +57,6 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
         )
 
         await ReiniciarConteo(user['usuario_nombre'])
-
         return {'data': {'access_token':access_token, 'expire_acces_token': ACCESS_TOKEN_EXPIRE_MINUTES, 'refersh_token': refersh_token,'expire_refersh_token':REFRESH_TOKEN_EXPIRE_DAYS}}
 
     except HTTPException as http_exc:
@@ -85,24 +85,29 @@ def refresh_token(refresh_token):
 
     new_access_token = crear_token(
         generar_token,
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
         secret=SECRET_KEY
     )
     return {"access_token": new_access_token, "token_type": "bearer"}
 
 
-def crear_token(payload: dict, expires_delta: timedelta, secret) -> str:
-    to_encode = payload.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({'exp': expire})
-    return jwt.encode(to_encode,secret, algorithm=ALGORITHM)
+def crear_token(payload: dict, expires_delta: timedelta, secret: str) -> str:
+    now = datetime.now(timezone.utc)
+    exp = now + expires_delta
+    to_encode = {
+        **payload,
+        "sub": payload.get("usuario_nombre") or payload.get("sub"),
+        "iat": int(now.timestamp()),
+        "exp": int(exp.timestamp()),
+    }
+    return jwt.encode(to_encode, secret, algorithm=ALGORITHM)
 
 
 
 
 async def decode_token(token: Annotated[str, Depends(oauth2_schema)])-> dict:
     try:
-        data = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         print(data)
         user = await ObtenerUsuariosPorUSuarioNombre(data['usuario_nombre'])
         return user
