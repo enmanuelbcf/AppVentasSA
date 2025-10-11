@@ -11,3 +11,4 @@ class CrearCuadreVenta(BaseModel):
     monto_credito: float
     monto_transferencia: float
 
+

@@ -1,5 +1,6 @@
 import logging
 import traceback
+from typing import List
 from zoneinfo import ZoneInfo
 
 from annotated_types import Timezone
@@ -10,6 +11,7 @@ from app.constants.general import Estados
 from core.Databases import db
 from crud.ParametroCrud import ObtenerParametro
 from schema.Negocios_schema import crearCuadreVenta
+from schema.preventaSchema import PreventaBase
 from utils.Security import hash_password
 
 
@@ -187,4 +189,40 @@ async def obtenerNegocioPorId(negocioId: int):
         return rows
     except Exception as e:
         logging.error("Ocurrió un error:\n" + traceback.format_exc())
+        raise e
+
+async def crear_negocio(descripcion:str, apikey:str):
+
+    try:
+        query = 'insert into negocios (descripcion) values ($1) returning id'
+        result = await db.fetch_one(query, descripcion)
+        negocioId = result[0]
+        query_apikey = 'insert into api_keys (api_key,negocio_id) values ($1, $2)'
+        await db.execute(query_apikey, hash_password(apikey), negocioId)
+
+    except Exception as e:
+        logging.error("Ocurrió un error:\n" + traceback.format_exc())
+        raise e
+
+async def crear_orden(negocioId:int, preventa:  List[PreventaBase]):
+    try:
+        query_orden = 'insert into ordenes (clienteid, fecha, negocioId) values ($1, now(), $2) returning ordenid'
+        result = await db.fetch_one(query_orden, preventa[0].clienteid, negocioId)
+        ordenid = result[0]
+
+        query_preventa = 'insert into preventa (ordenid, cantidad,codigoproducto, descripcion, precio) values ($1, $2, $3, $4, $5)'
+        for item in preventa:
+            await db.execute(
+                query_preventa,
+                ordenid,
+                item.cantidad,
+                item.codigoproducto,
+                item.descripcion,
+                item.precio
+            )
+
+        return True
+
+    except Exception as e:
+        logging.error("Ocurrió un error:" + traceback.format_exc())
         raise e

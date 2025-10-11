@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, Header, HTTPException, Depends, Query
 from starlette import status
 from starlette.responses import JSONResponse
@@ -7,9 +7,10 @@ from starlette.responses import JSONResponse
 from app.api.Auth import decode_token
 from app.constants.general import ERROR_INTERNO_SISTEMA, CUANDRE_INSERTADO, APIKEY_INVALIDA, ENCABEZADOS_REQUERIDOS
 from crud.MessageCrud import RegistrarMensaje
-from crud.Negocio_crud import buscar_negocio_por_id, obtenerNegocioPorId
+from crud.Negocio_crud import buscar_negocio_por_id, obtenerNegocioPorId, crear_orden
 from crud.Negocio_crud import insertar_cuadre_venta, ObtenerCuadrePorNegocioYFechas, ObtenerPlayersNegocio
 from schema.Negocios_schema import crearCuadreVenta
+from schema.preventaSchema import PreventaBase, Preventaout
 from service.one_signal_service import send_push_notification
 from utils.Security import verify_salt
 
@@ -125,6 +126,24 @@ async def ObtenerNegocioUsurio(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f'{ERROR_INTERNO_SISTEMA} - {str(e)}'
         )
+
+@router.post('/crear-orden', status_code=status.HTTP_201_CREATED)
+async def CrearOrdenService(
+        orden:List[PreventaBase],
+        my_user=Depends(decode_token)):
+    try:
+        order = await crear_orden(my_user['negocio_id'], orden)
+        return order
+
+    except HTTPException as http_exc:
+        raise http_exc
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'{ERROR_INTERNO_SISTEMA} - {str(e)}'
+        )
+
 
 
 

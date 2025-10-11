@@ -21,9 +21,9 @@ async def obtenerUsuarioServices(
     my_user=Depends(decode_token)
 ):
     try:
-        data = await BuscarUsuariosPorNombreParcialPaginado(nombreCliente, limit, offset)
+        data = await BuscarUsuariosPorNombreParcialPaginado(nombreCliente,my_user['negocio_id'], limit, offset)
 
-        if not data:  # lista vacía -> 404
+        if not data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Cliente no encontrado"
@@ -51,7 +51,6 @@ my_user=Depends(decode_token)):
     - teléfono: solo dígitos; si viene 11 y empieza con '1', recorta a 10
     """
     try:
-        # (Opcional) Validación de unicidad por RNC/Cédula
         if payload.rnc:
             dup = await db.fetch_one("SELECT clienteid FROM cliente WHERE rnc = $1 LIMIT 1", payload.rnc)
             if dup:
@@ -69,7 +68,6 @@ my_user=Depends(decode_token)):
         row = await db.fetch_one(insert_sql, payload.nombre, payload.rnc, payload.telefono)
 
         if not row:
-            # Algo inusual: no retornó fila
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="No se pudo crear el cliente"
@@ -78,7 +76,6 @@ my_user=Depends(decode_token)):
         return ClienteOut(**dict(row))
 
     except HTTPException:
-        # Re-lanza errores controlados de FastAPI
         raise
     except Exception as e:
         logging.error("Ocurrió un error:\n" + traceback.format_exc())
