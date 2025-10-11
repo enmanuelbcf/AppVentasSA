@@ -221,7 +221,7 @@ async def crear_orden(negocioId:int, preventa:  List[PreventaBase]):
                 item.precio
             )
 
-        return True
+        return ordenid
 
     except Exception as e:
         logging.error("Ocurrió un error:" + traceback.format_exc())
