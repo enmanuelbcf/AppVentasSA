@@ -132,7 +132,7 @@ async def CrearOrdenService(
         orden:List[PreventaBase],
         my_user=Depends(decode_token)):
     try:
-        order = await crear_orden(my_user['negocio_id'], orden)
+        order = await crear_orden(negocioId=my_user['negocio_id'], preventa=orden, usuarioId = my_user['usuario_id'])
         return order
 
     except HTTPException as http_exc:
