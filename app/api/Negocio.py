@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import Optional, List
 from fastapi import APIRouter, Header, HTTPException, Depends, Query
@@ -7,7 +8,7 @@ from starlette.responses import JSONResponse
 from app.api.Auth import decode_token
 from app.constants.general import ERROR_INTERNO_SISTEMA, CUANDRE_INSERTADO, APIKEY_INVALIDA, ENCABEZADOS_REQUERIDOS
 from crud.MessageCrud import RegistrarMensaje
-from crud.Negocio_crud import buscar_negocio_por_id, obtenerNegocioPorId, crear_orden
+from crud.Negocio_crud import buscar_negocio_por_id, obtenerNegocioPorId, crear_orden, obtenerOrden
 from crud.Negocio_crud import insertar_cuadre_venta, ObtenerCuadrePorNegocioYFechas, ObtenerPlayersNegocio
 from schema.Negocios_schema import crearCuadreVenta
 from schema.preventaSchema import PreventaBase, Preventaout
@@ -142,6 +143,34 @@ async def CrearOrdenService(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f'{ERROR_INTERNO_SISTEMA} - {str(e)}'
+        )
+
+from fastapi import Query
+
+@router.get('/obtener-orden')
+async def ObtenerOrdenServices(
+    nombre: str | None = Query(default=None, description='Nombre del cliente'),
+    ordenId: str | None = Query(default=None, description='Número de la orden'),
+    my_user=Depends(decode_token)
+):
+    try:
+        # Si viene vacío, lo convertimos a None
+        ordenId_int = int(ordenId) if ordenId and ordenId.isdigit() else None
+
+        ordenes = await obtenerOrden(
+            ordenId=ordenId_int,
+            nombre=nombre,
+            usuarioId=my_user['usuario_id']
+        )
+        return ordenes
+
+    except HTTPException as http_exc:
+        raise http_exc
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'Error interno del sistema - {str(e)}'
         )
 
 

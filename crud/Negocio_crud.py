@@ -1,11 +1,12 @@
 import logging
 import traceback
-from typing import List
+from typing import List, Optional
 from zoneinfo import ZoneInfo
 
 from annotated_types import Timezone
 from cffi.cffi_opcode import PRIM_INT
 from dns.e164 import query
+import json
 
 from app.constants.general import Estados
 from core.Databases import db
@@ -225,4 +226,43 @@ async def crear_orden(negocioId:int, preventa:  List[PreventaBase],usuarioId:int
 
     except Exception as e:
         logging.error("Ocurrió un error:" + traceback.format_exc())
+        raise e
+
+
+async def obtenerOrden(usuarioId: int, ordenId: int = None, nombre: str = None):
+    try:
+        query_orden = '''
+        SELECT
+    JSON_BUILD_OBJECT(
+        'ordenId', O.ORDENID,
+        'usuarioId', O.USUARIOID,
+        'nombre', C.NOMBRE,
+        'preventa', JSON_AGG(
+            JSON_BUILD_OBJECT(
+                'descripcion', P.DESCRIPCION,
+                'cantidad', P.CANTIDAD,
+                'precio', P.PRECIO,
+                'codigoProducto', P.CODIGOPRODUCTO
+            )
+        )
+    ) AS orden
+FROM ORDENES O
+JOIN PREVENTA P ON P.ORDENID = O.ORDENID
+JOIN CLIENTE C ON C.CLIENTEID = O.CLIENTEID
+WHERE
+    O.USUARIOID = $1
+    AND ($2::int IS NULL OR O.ORDENID = $2::int)
+    AND ($3::text IS NULL OR C.NOMBRE ILIKE '%' || $3::text || '%')
+GROUP BY
+    O.ORDENID, O.USUARIOID, C.NOMBRE
+        '''
+
+        result = await db.fetch_all(query_orden, usuarioId, ordenId, nombre)
+
+        ordenes = [json.loads(r['orden']) for r in result]
+
+        return ordenes
+
+    except Exception as e:
+        logging.error("Error en obtenerOrden: " + traceback.format_exc())
         raise e
