@@ -207,8 +207,8 @@ async def crear_negocio(descripcion:str, apikey:str):
 
 async def crear_orden(negocioId:int, preventa:  List[PreventaBase],usuarioId:int):
     try:
-        query_orden = 'insert into ordenes (clienteid, fecha, negocioId, usuarioId) values ($1, now(), $2, $3) returning ordenid'
-        result = await db.fetch_one(query_orden, preventa[0].clienteid, negocioId, usuarioId)
+        query_orden = 'insert into ordenes (clienteid, fecha, negocioId, usuarioId, nfc) values ($1, now(), $2, $3, $4) returning ordenid'
+        result = await db.fetch_one(query_orden, preventa[0].clienteid, negocioId, usuarioId, preventa[0].nfc)
         ordenid = result[0]
 
         query_preventa = 'insert into preventa (ordenid, cantidad,codigoproducto, descripcion, precio) values ($1, $2, $3, $4, $5)'
