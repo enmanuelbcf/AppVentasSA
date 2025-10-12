@@ -131,10 +131,11 @@ async def ObtenerNegocioUsurio(
 @router.post('/crear-orden', status_code=status.HTTP_201_CREATED)
 async def CrearOrdenService(
         orden:List[PreventaBase],
+        ncf: str = Query('Nfc de la factura'),
         my_user=Depends(decode_token)
         ):
     try:
-        order = await crear_orden(negocioId=my_user['negocio_id'], preventa=orden, usuarioId = my_user['usuario_id'])
+        order = await crear_orden(negocioId=my_user['negocio_id'], preventa=orden, usuarioId = my_user['usuario_id'], ncf=ncf)
         return order
 
     except HTTPException as http_exc:
