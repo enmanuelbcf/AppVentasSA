@@ -237,6 +237,7 @@ async def obtenerOrden(usuarioId: int, ordenId: int = None, nombre: str = None):
         'ordenId', O.ORDENID,
         'usuarioId', O.USUARIOID,
         'nombre', C.NOMBRE,
+        'RNC', c.rnc,
         'preventa', JSON_AGG(
             JSON_BUILD_OBJECT(
                 'descripcion', P.DESCRIPCION,
@@ -254,7 +255,7 @@ WHERE
     AND ($2::int IS NULL OR O.ORDENID = $2::int)
     AND ($3::text IS NULL OR C.NOMBRE ILIKE '%' || $3::text || '%')
 GROUP BY
-    O.ORDENID, O.USUARIOID, C.NOMBRE
+    O.ORDENID, O.USUARIOID, C.NOMBRE,C.RNC
         '''
 
         result = await db.fetch_all(query_orden, usuarioId, ordenId, nombre)
