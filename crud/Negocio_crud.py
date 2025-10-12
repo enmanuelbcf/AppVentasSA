@@ -237,7 +237,7 @@ async def obtenerOrden(usuarioId: int, ordenId: int = None, nombre: str = None):
         'ordenId', O.ORDENID,
         'usuarioId', O.USUARIOID,
         'nombre', C.NOMBRE,
-        'RNC', c.rnc,
+        'rnc', c.rnc,
         'preventa', JSON_AGG(
             JSON_BUILD_OBJECT(
                 'descripcion', P.DESCRIPCION,
