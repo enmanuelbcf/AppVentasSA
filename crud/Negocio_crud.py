@@ -257,6 +257,7 @@ WHERE
     AND ($3::text IS NULL OR C.NOMBRE ILIKE '%' || $3::text || '%')
 GROUP BY
     O.ORDENID, O.USUARIOID, C.NOMBRE,C.RNC,O.NCF
+order by o.FECHA DESC;
         '''
 
         result = await db.fetch_all(query_orden, usuarioId, ordenId, nombre)
