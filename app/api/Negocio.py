@@ -72,6 +72,8 @@ async def Envio_cuadre(cuadre: crearCuadreVenta, headers_validado:dict = Depends
         raise http_exc
 
     except Exception as e:
+
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f'{ERROR_INTERNO_SISTEMA} - {str(e)}'

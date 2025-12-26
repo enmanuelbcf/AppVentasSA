@@ -1,22 +1,24 @@
 import logging
+import math
 import traceback
+from datetime import datetime
 from typing import List, Optional
 from zoneinfo import ZoneInfo
-
-from annotated_types import Timezone
-from cffi.cffi_opcode import PRIM_INT
-from dns.e164 import query
 import json
 
 from app.constants.general import Estados
 from core.Databases import db
+from core.constant import Servicios
+from crud.Historico_crud import insertar_bicatora_errores
 from crud.ParametroCrud import ObtenerParametro
 from schema.Negocios_schema import crearCuadreVenta
 from schema.preventaSchema import PreventaBase
 from utils.Security import hash_password
 
 
+
 async def insertar_cuadre_venta(cuadre: crearCuadreVenta, negocio_id:int):
+    global fecha_rd
     try:
         query='''
                 INSERT INTO cuadre_ventas (
@@ -35,7 +37,7 @@ async def insertar_cuadre_venta(cuadre: crearCuadreVenta, negocio_id:int):
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
         );
         '''
-        fecha_rd = datetime.now(ZoneInfo("America/Santo_Domingo"))
+        fecha_rd = datetime.now()
         await db.execute(
             query,
             cuadre.usuario,
@@ -52,16 +54,27 @@ async def insertar_cuadre_venta(cuadre: crearCuadreVenta, negocio_id:int):
         )
 
     except Exception as e:
+
+        datos = {
+            'usuario': cuadre.usuario,
+            'nombre_completo': cuadre.nombre_completo,
+            'numero_caja': cuadre.numero_caja,
+            'cuadre_id': cuadre.cuadre_id,
+            'efectivo': cuadre.efectivo,
+            'monto_cheque': cuadre.monto_cheque,
+            'monto_tarjeta': cuadre.monto_tarjeta,
+            'monto_credito': cuadre.monto_credito,
+            'monto_transferencia': cuadre.monto_transferencia,
+            'negocio_id': negocio_id,
+        }
+        datos_json = json.dumps(datos)
+        await insertar_bicatora_errores(
+            Servicios.ENVIO_PUSH,
+            str(traceback.format_exc()),
+            datos_json,
+            cuadre.usuario)
+
         raise e
-
-from datetime import datetime, timedelta
-
-
-import math  # para usar math.ceil
-
-import math
-
-import math
 
 async def ObtenerCuadrePorNegocioYFechas(
         NegocioId: int,

@@ -3,6 +3,8 @@ import traceback
 from datetime import datetime
 
 from core.Databases import db
+from crud.Historico_crud import insertar_bicatora_errores
+from schema.Bitacora_schema import CrearBitacoraErrores
 from schema.Cuadre_schema import CrearCuadreVenta
 
 
@@ -42,4 +44,13 @@ async def insertar_cuadre_venta(cuadre: CrearCuadreVenta):
         )
     except Exception as e:
         logging.error("Ocurrió un error:\n" + traceback.format_exc())
+
+        bitacora_error = CrearBitacoraErrores(
+            servicioId=1,
+            descripcionError=e,
+            datosRelacionados=cuadre,
+            usuario_id=cuadre.usuario_id
+        )
+        await insertar_bicatora_errores(bitacora_error)
+
         raise e

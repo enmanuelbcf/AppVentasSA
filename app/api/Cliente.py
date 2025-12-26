@@ -8,7 +8,7 @@ from uvicorn import logging
 from app.api.Auth import decode_token
 from app.constants.general import ERROR_INTERNO_SISTEMA
 from core.Databases import db
-from crud.ClienteCrud import BuscarUsuariosPorNombreParcialPaginado
+from crud.ClienteCrud import BuscarUsuariosPorNombreParcialPaginado, CrearCliente
 from schema.clineteSchema import ClienteOut, ClienteCreate
 
 router = APIRouter(prefix='/Cliente', tags=['cliente'])
@@ -40,45 +40,51 @@ async def obtenerUsuarioServices(
             detail=f"{ERROR_INTERNO_SISTEMA} - {str(e)}"
         )
 
-@router.post("/crearCliente", response_model=ClienteOut, status_code=status.HTTP_201_CREATED)
+
+@router.post("/crear-cliente", status_code=status.HTTP_201_CREATED)
 async def crear_cliente_service(
-        payload: ClienteCreate,
-my_user=Depends(decode_token)):
-    """
-    Crea un cliente. Valida/normaliza con Pydantic:
-    - nombre requerido
-    - rnc/cédula: solo dígitos (9 o 11)
-    - teléfono: solo dígitos; si viene 11 y empieza con '1', recorta a 10
-    """
+    payload: ClienteCreate,
+    my_user=Depends(decode_token)
+):
+
     try:
+        if not payload.nombre or payload.nombre.strip() == "":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El campo 'nombre' es obligatorio."
+            )
         if payload.rnc:
-            dup = await db.fetch_one("SELECT clienteid FROM cliente WHERE rnc = $1 LIMIT 1", payload.rnc)
-            if dup:
+            rnc = payload.rnc.replace("-", "").strip()
+            if not (len(rnc) in (9, 11) and rnc.isdigit()):
                 raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail="El RNC/Cédula ya existe"
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="El RNC/Cédula debe tener 9 (RNC) o 11 (Cédula) dígitos numéricos."
                 )
 
-        # Insert
-        insert_sql = """
-            INSERT INTO cliente (nombre, rnc, telefono)
-            VALUES ($1, $2, $3)
-            RETURNING clienteid, nombre, rnc, telefono
-        """
-        row = await db.fetch_one(insert_sql, payload.nombre, payload.rnc, payload.telefono)
 
-        if not row:
+        negocio_id = my_user["negocio_id"]
+        nuevo_cliente = await CrearCliente(payload, negocio_id)
+
+        if not nuevo_cliente:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="No se pudo crear el cliente"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No se pudo crear el cliente. Verifique los datos enviados."
             )
 
-        return ClienteOut(**dict(row))
+        return {
+            "status": "success",
+            "message": "Cliente creado correctamente.",
+            "data": nuevo_cliente
+        }
 
-    except HTTPException:
-        raise
+    except HTTPException as http_exc:
+        raise http_exc
+
     except Exception as e:
-        logging.error("Ocurrió un error:\n" + traceback.format_exc())
+        logging.error(
+            f"❌ Error interno al crear cliente (negocio_id={my_user.get('negocio_id')}):\n"
+            + traceback.format_exc()
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"{ERROR_INTERNO_SISTEMA} - {str(e)}"
